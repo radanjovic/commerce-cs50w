@@ -1,0 +1,25 @@
+{% extends 'auctions/layout.html' %}
+
+{% block body %}
+
+    <h2 class="page_title">Watchlist</h2>
+
+    {% for listing in listings %}
+
+        <div class="active_listings">
+            <!-- Image -->
+            <div class="active_listings_image">
+                <img class="img-thumbnail" src="{{ listing.photo_URL }}" border=0 alt="photo">
+            </div>
+            <!-- Text -->
+            <div class="active_listings_text">
+                <h3><a class="listing_links" href="{% url 'listing' listing.id %}">{{ listing.title }}</a></h3>
+                <p>{{ listing.description }}</p>
+            </div>
+        </div>
+    {% empty %}
+        <h6>Your Watchlist is empty.</h6>
+        <p>If you wish to add listings to your wishlist, go to the listing and click on "Wishlist" button.</p>
+    {% endfor %}
+
+{% endblock %}

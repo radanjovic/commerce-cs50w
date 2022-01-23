@@ -1,0 +1,134 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <!--Shows status of listing-->
+    {% if listing.status == "C" %}
+        <div class="alert alert-danger" role="alert">
+            Status: <strong>CLOSED AUCTION</strong>.
+        </div>
+        {% if bid %} 
+            {% if bid.user_id != user %}
+                <div class="alert alert-warning" role="alert">
+                    The winner of this auction is: <strong>{{ bid.user_id }}</strong>
+                </div>
+            {% else %}
+                <div class="alert alert-success" role="alert">
+                    <strong>Congradulations!!! You are the winner of this auction!</strong>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-warning" role="alert">
+                There were no bids for this auction.
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-primary" role="alert">
+            Status: <strong>ACTIVE LISTING</strong>. Logged in users can bid on this listing.
+        </div>
+    {% endif %}
+    
+    <!--Lists details about the listing-->
+    <div class="active_listings">
+        <!-- Image -->
+        <div class="active_listings_image">
+            <img class="img-thumbnail" src="{{ listing.photo_URL }}" border=0 alt="photo">
+        </div>
+        <!-- Text -->
+        <div class="active_listings_text">
+            <h3>{{ listing.title }}</h3>
+            <strong>Description:</strong><br>{{ listing.description|linebreaks }}
+            <strong>Initial price:</strong> <strong><span style="color: rgb(38, 204, 38);">${{ listing.initial_price }}</span></strong><br>
+            {% if listing.category %}
+                <strong>Category:</strong> {{ listing.category }}<br>
+            {% endif %}
+            <strong>Listed by:</strong> {{ listing.owner }}<br>
+            <small>{{ listing.created }}</small><br>
+            {% if user.is_authenticated and listing.status == "A" %}
+                <form style="display: inline;" action="{% url 'listing' listing.id %}" method="post">
+                    {% csrf_token %}
+                    <input type="submit" class="btn btn-warning" style="color: white;" name="watchlist" value="Watchlist">
+                </form>
+            {% endif %}
+            {% if listing.status == "A" and user.is_authenticated and user == listing.owner %}
+                <form style="display: inline;" action="{% url 'listing' listing.id %}" method="post">
+                    {% csrf_token %}
+                    <input type="submit" name="close" class="btn btn-danger" id="close_auction_button" value="Close Auction">
+                </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <!--Displays comments and bids-->
+    <div class="cb_container">
+        
+        <div class="cb_child" id="bidding">
+            <h3 class="page_title">Bidding</h3><br>
+            {% if listing.status == "A" %}
+                {% if bid %}
+                    {% if bid.user_id != user %}
+                        <div class="alert alert-warning" role="alert">
+                            Highest bid so far is: <strong><span style="color: rgb(38, 204, 38);">${{ bid.bid }}</span></strong> by: <strong>{{ bid.user_id }}</strong>.<br>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info" role="alert">
+                            Your bid of: <strong><span style="color: rgb(38, 204, 38);">${{ bid.bid }}</span></strong> is the highest bid so far!
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="alert alert-warning" role="alert">
+                        No bids yet. Be the first one to bid on this listing.
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-danger" role="alert">
+                    This auction is closed: No more bids can be placed for this listing.
+                </div>
+            {% endif %}
+
+            {% if user.is_authenticated and listing.status == "A" %}
+            {% if message %}
+                <div class="alert alert-danger" role="alert">
+                    {{ message }}
+                </div>
+            {% endif %}
+            <br>
+            <div class="bid">
+                <h5 class="page_title">Bid on this listing:</h5><br>
+                <form action="{% url 'listing' listing.id %}" method="post">
+                    {% csrf_token %}
+                    {{ form_b }}
+                    <input type="submit" class="btn btn-success" name="post_bid" value="Place Bid">
+                </form>
+            </div>
+        {% endif %}
+        </div>
+        <div class="cb_child">
+            <h3 class="page_title">Comments</h3><br>
+            {% for comment in comments%}
+                <div class="comment">
+                    <strong>{{ comment.user_id }}</strong> says:
+                    <p class="comment_p">{{ comment.comment }}</p>
+                    <small class="comment_date">{{ comment.created }}</small><br>
+                </div>
+            {% empty %}
+                {% if listing.status == "A" %}
+                    <div class="alert alert-warning" role="alert">
+                        No comments yet. Be the first one to comment on this listing.
+                    </div>
+                {% else %}
+                    <div class="alert alert-danger" role="alert">
+                        This auction is closed. No more comments can be added on this listing.
+                    </div>
+                {% endif %}
+            {% endfor %}
+            {% if user.is_authenticated and listing.status == "A" %}
+                <br><form action="{% url 'listing' listing.id %}" method="post">
+                    {% csrf_token %}
+                    {{ form_c }}
+                    <br><input style="color: white;" id="comment_button" class="btn btn-info" type="submit" name="post_comment" value="Comment">
+                </form>
+            {% endif %}
+        </div>
+    </div>
+    
+{% endblock %}

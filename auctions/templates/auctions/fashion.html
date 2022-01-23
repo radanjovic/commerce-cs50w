@@ -1,0 +1,33 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    <h2 class="page_title">Fashion</h2>
+
+    {% for listing in listings %}
+        <div class="active_listings">
+            <!-- Image -->
+            <div class="active_listings_image">
+                <img class="img-thumbnail" src="{{ listing.photo_URL }}" border=0 alt="photo">
+            </div>
+            <!-- Text -->
+            <div class="active_listings_text">
+                <h3><a class="listing_links" href="{% url 'listing' listing.id %}">{{ listing.title }}</a></h3>
+                <strong>Description:</strong><br>{{ listing.description }}<br>
+                {% for bid in bids %}
+                    {% if bid.id == listing.id %}
+                        <h5>Current price: ${{ bid.bid }}</h5>
+                    {% endif %}
+                {% endfor %}
+                <p><strong>Listed by:</strong> {{ listing.owner }}</p>
+                <small>{{ listing.created }}</small>
+            </div>
+        </div>
+    {% empty %}
+        <p>No listings in this category yet.</p>
+        {% if user.is_authenticated %}
+            <p><a href="{% url 'create' %}">Create </a>new listing?</p>
+        {% endif %}
+    {% endfor %}
+
+{% endblock %}

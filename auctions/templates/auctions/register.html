@@ -1,0 +1,37 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    <h2 style="text-align: center;">Register</h2>
+
+    {% if message %}
+        <div>{{ message }}</div>
+    {% endif %}
+
+    <div class="login_form">
+        <form action="{% url 'register' %}" method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="username" class="form-label">Enter Your Preferred Username:</label>
+                <input id="username" class="form-control" autofocus type="text" name="username" placeholder="Username">
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Enter Your Email:</label>
+                <input id="email" class="form-control" type="email" name="email" placeholder="Email Address">
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Enter Your Password:</label>
+                <input id="password" class="form-control" type="password" name="password" placeholder="Password">
+            </div>
+            <div class="mb-3">
+                <label for="confirmation" class="form-label">Repeat Your Password:</label>
+                <input id="confirmation" class="form-control" type="password" name="confirmation" placeholder="Confirm Password">
+            </div>
+            <input class="btn btn-primary" id="login_button" type="submit" value="Register">
+        </form>
+        <br>
+            <p>Already have an account? <a href="{% url 'login' %}">Log In here.</a></p>
+        <br>
+    </div>
+
+{% endblock %}
